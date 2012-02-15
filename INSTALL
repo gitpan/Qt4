@@ -1,59 +1,31 @@
-PerlQt version 0.60_b1
+PerlQt version 0.96
 ===================
 
-For simple install instructions, see the README file.
+For simple installation instructions, see the README file.
 
-You can build this module using either the Build.PL script, or CMake.
-
-PREREQUISITES
-===================
-Perl > 5.  I've tested on Perl 5.8.6 and 5.10.0.
-Qt > 4.0.  I've tested on Qt 4.4.3, 4.5.0, 4.5.1, and 4.5.2.
-libsmokeqt/Alien::QtSmoke > 4.3.0.
-cmake      ( to build Alien::QtSmoke ).
-
-ABOUT LIBSMOKEQT
-===================
-This module uses libsmokeqt to talk to the Qt library.  QtSmoke is maintained
-by KDE developers, in the kdebindings package.  Alien::QtSmoke can take care of
-installing this library for you.  Or, if you have installed a system version of
-kdebindings, you can tell either Build.PL or CMake where to find it.
-
-Build.PL
-===================
-The Build.PL script accepts the following options:
-    --with-smoke-dir      The prefix where libsmokeqt is installed.
-    --with-smoke-inc-dir  The path to smoke.h, defaults to ${smokedir}/inc.
-    --with-smoke-lib-dir  The path to libsmokeqt.so, defaults to ${smokedir}/lib.
-    --with-qt-dir         The prefix where Qt is installed.
-    --with-qt-inc-dir     The path to the Qt headers, defaults to ${qtdir}/inc.
-    --with-qt-lib-dir     The path to the Qt libraries, defaults to ${qtdir}/lib.
-    --build-debug         Enable runtime debugging options.
-
-Usually, arguments to Build.PL are not required.  If Alien::QtSmoke is
-installed, Build.PL will use the paths provided by that module to determine
-where to find libsmokeqt.  Build.PL tries both pkg-config and qmake to detect
-Qt.  Make sure that qmake is in your path before running Build.PL
-
-To build the bidnings, run
-    perl Build.PL
-    ./Build
-    ./Build install
-
-CMake
-===================
-
-If you don't have cmake, you can download the most recent version at
+This module uses cmake for its build system.  If you don't have it, you can
+download the most recent version at
 http://www.cmake.org/cmake/resources/software.html
 
-First, I recommend building the module in it's own directory.  Type:
+=== Makefile.PL ===
+The Makefile.PL is just a wrapper around calls to cmake.  Calling
+"Makefile.PL PREFIX=~/mycpan QMAKE=/opt/qt/bin/qmake"
+is the same thing as running
+"cmake . -DCMAKE_INSTALL_PREFIX=~/mycpan -DQT_QMAKE_EXECUTABLE=/opt/qt/bin/qmake"
+Makefile.PL builds an in-source-tree build.  It's a lot easier to get a clean
+source tree if you use an out-of-source build, as described below.
+
+=== CMake ===
+First, I recommend building the module in its own directory.  Type:
     mkdir build
     cd build
 
 cmake provides a nice 'GUI'ish interface to view compile time options.  To view
-this, type:
+this, type either:
+    cmake-gui ..
+
+Or if it's not available:
     ccmake ..
-    c
 
 Once that finishes, exit with 'q', and type:
     cmake ..
@@ -65,15 +37,7 @@ The standard options are:
     CMAKE_BUILD_TYPE = The type of build ('Debug', 'Release', etc)
     CMAKE_INSTALL_PREFIX = The location for any executables ( e.g. puic4 )
     CUSTOM_PERL_SITE_ARCH_DIR = The location for the perl modules themselves.
-    ENABLE_PERLQT = Build PerlQt bindings.  You'll want this.
-    ENABLE_SMOKE = Build SmokeQt.  See below.
     QT_QMAKE_EXECUTABLE = The path to your system's qmake.
-
-Building this module involves 2 main parts.  First it builds the smokeqt
-object, then it builds the bindings.  The Smoke object is the generic interface
-to the Qt library that the Perl bindings are built on top of.  If you already
-have a SmokeQt object built, you can use your system's library by setting
-ENABLE_SMOKE=OFF.
 
 cmake looks in your path for a qmake executable.  If it can't find it, it will
 complain and fail to configure properly.  If your qmake is not in your path,
